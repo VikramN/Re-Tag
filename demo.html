@@ -3,6 +3,20 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Re - Tag Demo</title>
+    <style>
+        @import url(http://fonts.googleapis.com/css?family=Roboto+Condensed);
+
+        body{
+            font-family: 'Roboto Condensed', sans-serif;
+            width: 90%;
+            margin: 0px auto;
+        }
+
+        a {
+            text-decoration: none;
+            color: #ff604c;
+        }
+    </style>
     <script src="lib/react.min.js" ></script>
     <script src="lib/JSXTransformer.js" ></script>
     <script src="lib/TagCollection.js" ></script>
@@ -33,7 +47,10 @@
         <div style="width: 47%; display: inline-block;vertical-align: top">
             <h3>Demo 2</h3>
             <p> Tags appear in the next line. This doesn't handle Enter key or Blur events. <br />
-                By default only SPACE and , are used to split tags</p>
+                By default only SPACE and , are used to split tags <br />
+                You can also provide options on the model to disallow duplicates, and also custom filter function. This one doesn't allow duplicates, and is also case in-sesitive <br />
+            </p>
+
             <div style="border: 1px solid #ddd; width: 90%; min-height: 150px;">
                 <div id="tagInput2" style="display: block;">
 
@@ -51,27 +68,62 @@
 
     <h2>Sample Code</h2>
     <pre>
-        // Simple default model
+        // Default model
         var tags1 = new TagCollection();
+
+        // Default model with options
+        var tags1 = new TagCollection({
+            duplicates : {
+                // Dups are allowed by default
+                allow : false,
+
+                // If not provided, we use ===
+                // tags will be array of { tag: , key: }
+                contains : function(item, tags) {
+                    var lTag = item.toLowerCase();
+                    for(var i =0; i < tags.length; i++) {
+                        if(tags[i] && tags[i].tag.toLowerCase() === lTag){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+        });
 
         // Render Tag Component
         // props: css = css class for each tag, collection = set to the model
         React.render(&lt;Tags css={'tag'} deleteCss={'deleteTag'} collection={tags1} /&gt;, document.getElementById('tagContainer1'));
 
         // Render the tag input component, this is the one that accepts user input
-        // props: css : input[type=text] css class, collection : model, breaks: array of chars to use for splitting, handleBlur & handleEnter explained above
-        var input1 =  React.render(&lt;TagInput css={'tagInput1'} collection={tags1} breaks={[' ', ',', ';', '.']} handleBlur={true} handleEnter={true} /&gt;,
+        // props:   css : input[type=text] css class,
+                    collection : model,
+                    breaks: array of chars to use for splitting [optional, defaults to , and SPACE]
+                    handleBlur : create tag on blur event [optional, won't handle]
+                    handleEnter : create tag on enter press [optional, won't handle]
+
+        var input1 =  React.render(
+            &lt;TagInput css={'tagInput1'}
+                collection={tags1}
+                breaks={[' ', ',', ';', '.']}
+                handleBlur={true}
+                handleEnter={true} /&gt;,
             document.getElementById('tagInput1') );
 
-        // Example to set focus to input
+        // Example to set focus to input from outside
         document.getElementById('make_focus').onclick = function(){
             input1.setFocus();
         };
+
+        // When all said and done, you can use getTags() to get array of tags held by the model
+        tags1.getTags()
+
     </pre>
 
     <script type="text/jsx">
         // Demo 1
         var tags1 = new TagCollection();
+
         React.render(<Tags css={'tag'} deleteCss={'deleteTag'} collection={tags1} />, document.getElementById('tagContainer1') );
         var input1 =  React.render(<TagInput css={'tagInput1'} collection={tags1} breaks={[' ', ',', ';', '.']} handleBlur={true} handleEnter={true} />, document.getElementById('tagInput1') );
 
@@ -81,7 +133,21 @@
         };
 
         // Demo 2
-        var tags2 = new TagCollection();
+        var tags2 = new TagCollection({
+            duplicates : {
+                allow : false,
+                contains : function(item, tags) {
+                    debugger;
+                    var lTag = item.toLowerCase();
+                    for(var i =0; i < tags.length; i++) {
+                        if(tags[i] && tags[i].tag.toLowerCase() === lTag){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+        });
         React.render(<Tags css={'tag'} deleteCss={'deleteTag'} collection={tags2}/>, document.getElementById('tagContainer2') );
         React.render(<TagInput css={'tagInput2'} collection={tags2}  />, document.getElementById('tagInput2') );
 
