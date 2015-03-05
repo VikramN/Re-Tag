@@ -2,41 +2,18 @@
 (function() {
   this.TagCollection = (function() {
     function TagCollection(options) {
-      var dup;
       this._index = 0;
       this._tags = [];
       this._observers = [];
-      this._allowDups = true;
-      this._contains = (function(_this) {
-        return function(tag) {
-          var t, _i, _len, _ref;
-          _ref = _this._tags;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            t = _ref[_i];
-            if (tag === t.tag) {
-              return true;
-            }
-          }
-          return false;
-        };
-      })(this);
-      if (options && options.duplicates && 'allow' in options.duplicates) {
-        dup = options.duplicates;
-        this._allowDups = dup.allow;
-        if (!this._allowDups && dup.contains && typeof dup.contains === 'function') {
-          this._contains = (function(_this) {
-            return function(item) {
-              return dup.contains(item, _this._tags);
-            };
-          })(this);
-        }
-      }
+      this._onAdd = options && typeof options.onAdd === 'function' ? options.onAdd : null;
+      this._onDelete = options && typeof options.onDelete === 'function' ? options.onDelete : null;
     }
 
     TagCollection.prototype._add = function(tag) {
-      if (this._allowDups || (!this._allowDups && !this._contains(tag))) {
+      tag = this._onAdd ? this._onAdd(tag, this._tags) : tag;
+      if (tag) {
         this._index++;
-        return this._tags.push({
+        this._tags.push({
           tag: tag,
           key: '' + this._index
         });
@@ -60,20 +37,23 @@
     };
 
     TagCollection.prototype.remove = function(key) {
-      var t;
-      this._tags = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this._tags;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          t = _ref[_i];
-          if (t.key !== key) {
-            _results.push(t);
+      var remove, t;
+      remove = this._onDelete ? this._onDelete(key, this._tags) : true;
+      if (remove) {
+        this._tags = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this._tags;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            if (t.key !== key) {
+              _results.push(t);
+            }
           }
-        }
-        return _results;
-      }).call(this);
-      this._fire();
+          return _results;
+        }).call(this);
+        this._fire();
+      }
     };
 
     TagCollection.prototype.listen = function(callback) {
@@ -110,4 +90,5 @@
   })();
 
 }).call(this);
+
 
