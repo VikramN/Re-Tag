@@ -3,27 +3,16 @@ class @TagCollection
     @_index = 0
     @_tags =  []
     @_observers = []
-    @_allowDups = true
-    @_contains = (tag) =>
-      for t in @_tags
-        if tag is t.tag
-          return true
-      return false
-
-    if options and options.duplicates and 'allow' of options.duplicates
-      dup = options.duplicates
-
-      @_allowDups = dup.allow
-
-      # Did user provide a contains function?
-      if not @_allowDups and dup.contains and typeof(dup.contains) is 'function'
-        @_contains = (item) =>
-          return dup.contains(item, @_tags)
+    @_onAdd = if options and typeof(options.onAdd) is 'function' then options.onAdd else null
+    @_onDelete = if options and typeof(options.onDelete) is 'function' then options.onDelete else null
 
   _add : (tag) ->
-    if @_allowDups or (not @_allowDups and not @_contains(tag))
+    tag = if @_onAdd then @_onAdd(tag, @_tags) else tag
+    if tag
       @_index++
       @_tags.push({ tag : tag, key : '' + @_index  })
+
+    return
 
   addRange : (tags)->
     for t in tags
@@ -39,8 +28,12 @@ class @TagCollection
     return
 
   remove : (key) ->
-    @_tags = (t for t in @_tags when t.key isnt key)
-    @_fire()
+    remove = if @_onDelete then @_onDelete(key, @_tags) else true
+
+    if remove
+      @_tags = (t for t in @_tags when t.key isnt key)
+      @_fire()
+
     return
 
   listen : (callback) ->
