@@ -34,7 +34,7 @@
             <h3>Demo 2</h3>
             <p> Tags appear in the next line. This doesn't handle Enter key or Blur events. <br />
                 By default only SPACE and , are used to split tags <br />
-                You can also provide options on the model to disallow duplicates, and also custom filter function. This one doesn't allow duplicates, and is also case in-sesitive <br />
+                You can also provide options on the model to handle add and delete events. This one for example, will add tags as lower-case, will not allow duplicates and won't let you delete first 5 tags<br />
             </p>
             <div style="border: 1px solid #ddd; width: 90%; min-height: 150px;">
                 <div id="tagInput2" style="display: block;">
@@ -52,27 +52,36 @@
     </p>
 
     <h2>Sample Code</h2>
-    <pre>
+      <pre>
         // Default model
         var tags1 = new TagCollection();
 
         // Default model with options
         var tags1 = new TagCollection({
-            duplicates : {
-                // Dups are allowed by default
-                allow : false,
 
-                // If not provided, we use ===
-                // tags will be array of { tag: , key: }
-                contains : function(item, tags) {
-                    var lTag = item.toLowerCase();
-                    for(var i =0; i < tags.length; i++) {
-                        if(tags[i] && tags[i].tag.toLowerCase() === lTag){
-                            return true;
-                        }
+            // Return null to ignore add, else return the value that needs to be added
+            // You can do lookups, case conversion etc
+            onAdd : function(item, list){
+                var x = item.toLowerCase();
+                for(var i =0; i < list.length; i++) {
+                    if(list[i].tag.toLowerCase() === x) {
+                        return null;
                     }
-                    return false;
                 }
+
+                return x;
+            },
+
+            // Return true to delete, false to ignore delete
+            // Note - Key is passed in this scenario
+            onDelete : function(key, list){
+                for(var i =0; i < list.length; i++) {
+                    if(list[i].key === key && i < 5) {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         });
 
@@ -119,18 +128,25 @@
 
         // Demo 2
         var tags2 = new TagCollection({
-            duplicates : {
-                allow : false,
-                contains : function(item, tags) {
-                    debugger;
-                    var lTag = item.toLowerCase();
-                    for(var i =0; i < tags.length; i++) {
-                        if(tags[i] && tags[i].tag.toLowerCase() === lTag){
-                            return true;
-                        }
+            onAdd : function(item, list){
+                var x = item.toLowerCase();
+                for(var i =0; i < list.length; i++) {
+                    if(list[i].tag.toLowerCase() === x) {
+                        return null;
                     }
-                    return false;
                 }
+
+                return x;
+            },
+
+            onDelete : function(key, list){
+                for(var i =0; i < list.length; i++) {
+                    if(list[i].key === key && i < 5) {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         });
         React.render(<Tags css={'tag'} deleteCss={'deleteTag'} collection={tags2}/>, document.getElementById('tagContainer2') );
