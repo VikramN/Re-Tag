@@ -1,0 +1,28 @@
+{
+  "name": "re-tag",
+  "version": "0.0.1",
+  "description": "React.js Tag Component",
+  "main": "./bin/retag.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VikramN/Re-Tag"
+  },
+
+  "keywords": [
+    "facebook",
+    "react",
+    "tag",
+    "tags",
+    "react-component",
+    "vikram"
+  ],
+  "author": "Vikram @TheVikO_o",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VikramN/Re-Tag/issues"
+  },
+  "homepage": "http://vikramn.github.io/Re-Tag/",
+  "dependencies": {
+    "react": "^0.12.2"
+  }
+}

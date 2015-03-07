@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Re - Tag Demo</title>
+    <style>
+        @import url(http://fonts.googleapis.com/css?family=Roboto+Condensed);
+
+        body{
+            font-family: 'Roboto Condensed', sans-serif;
+            width: 90%;
+            margin: 0px auto;
+        }
+
+        a {
+            text-decoration: none;
+            color: #ff604c;
+        }
+    </style>
+    <script src="react.js" ></script>
+    <script src="JSXTransformer.js" ></script>
+    <script src="../bin/retag.js"></script>
+</head>
+<body>
+    <a href="https://github.com/VikramN/Re-Tag">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+    </a>
+
+    <h1><a target="_blank" href="https://github.com/VikramN/Re-Tag">Re - Tag</a></h1>
+
+    <p>React.js Tag Component</p>
+    <h3><a target="_blank" href="https://github.com/VikramN">By Vikram</a></h3>
+
+    <div>
+        <div style="width: 50%; display: inline-block; vertical-align: top">
+            <h3>Demo 1</h3>
+            <p style="line-height: 1.5"> In-line tags, just like in gmail. This has the following props set : breaks, handleBlur & handleEnter. <br />
+                You supply an array of chars that split a tag in the breaks prop ( , . ; and SPACE in this demo) <br />
+                You can type something and change focus to some other element to check out handleBlur<br />
+                You can hit enter to create tag cos we set handleEnter<br />
+            </p>
+            <div style="border: 1px solid #ddd; width: 90%; min-height: 150px;" id="make_focus">
+                <div id="tagContainer1" style="display: inline;"></div>
+                <div id="tagInput1" style="display: inline;">
+
+                </div>
+            </div>
+        </div>
+        <div style="width: 47%; display: inline-block;vertical-align: top">
+            <h3>Demo 2</h3>
+            <p style="line-height: 1.5"> Tags appear in the next line. This doesn't handle Enter key or Blur events. <br />
+                By default only SPACE and , are used to split tags <br />
+                You can also provide options on the model to handle add and delete events. This one for example, will add tags as lower-case, will not allow duplicates and won't let you delete first 5 tags<br />
+            </p>
+
+            <div style="border: 1px solid #ddd; width: 90%; min-height: 150px;">
+                <div id="tagInput2" style="display: block;">
+
+                </div>
+                <div id="tagContainer2" style="display: inline;"></div>
+            </div>
+        </div>
+    </div>
+    <p>
+        You can check out Demo.html & Demo.css to see how the components are created. <br />
+        You can provide your custom css class for tags as well for the input. <br />
+        There are actually 2 components, one to just render the tags, and one to accept input. They can be run independently too. <br />
+        There is a default model implementation TagCollection. You can ditch that and provide your implementation, just stick to the necessary interfaces. This model is very simple, it would be ideal to provide an immutable one.
+    </p>
+
+    <h2>Sample Code</h2>
+    <script src="https://gist.github.com/VikramN/8a421db41863339b6488.js"></script>
+
+    <script type="text/jsx">
+        // Demo 1
+        var tags1 = new ReTag.TagCollection();
+
+        React.render(<ReTag.Tags css={'tag'} deleteCss={'deleteTag'} collection={tags1} />, document.getElementById('tagContainer1') );
+        var input1 =  React.render(<ReTag.TagInput css={'tagInput1'} collection={tags1} breaks={[' ', ',', ';', '.']} handleBlur={true} handleEnter={true} />, document.getElementById('tagInput1') );
+
+        // Set focus to input
+        document.getElementById('make_focus').onclick = function(){
+            input1.setFocus();
+        };
+
+        // Demo 2
+        var tags2 = new ReTag.TagCollection({
+            onAdd : function(item, list){
+                var x = item.toLowerCase();
+                for(var i =0; i < list.length; i++) {
+                    if(list[i].tag.toLowerCase() === x) {
+                        return null;
+                    }
+                }
+
+                return x;
+            },
+
+            onDelete : function(key, list){
+                for(var i =0; i < list.length; i++) {
+                    if(list[i].key === key && i < 5) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        });
+        React.render(<ReTag.Tags css={'tag'} deleteCss={'deleteTag'} collection={tags2}/>, document.getElementById('tagContainer2') );
+        React.render(<ReTag.TagInput css={'tagInput2'} collection={tags2}  />, document.getElementById('tagInput2') );
+
+        ReTag.addDefaultStyles();
+
+        // Try in console for fun
+        function add1(tag){
+            window.tags1.add(tag);
+        }
+
+        function addmany1(tags){ // Pass array
+            window.tags1.addRange(tags);
+        }
+
+    </script>
+</body>
+</html>
