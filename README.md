@@ -2,7 +2,9 @@
 
 React.js Tag Component
 
-### By Vikram
+By Vikram
+
+![Screenshot](https://github.com/VikramN/Re-Tag/blob/gh-pages/images/scrshot.jpg)
 
 ## Demo Page
 http://vikramn.github.io/Re-Tag/
