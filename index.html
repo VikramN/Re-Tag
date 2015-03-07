@@ -5,20 +5,22 @@
     <title>Re - Tag Demo</title>
     <script src="javascripts/react.min.js" ></script>
     <script src="javascripts/JSXTransformer.js" ></script>
-    <script src="javascripts/TagCollection.js" ></script>
     <script src="javascripts/retag.js" type="text/jsx" ></script>
-    <link href="stylesheets/demo.css" rel="stylesheet">
 </head>
 <body>
+    <a href="https://github.com/VikramN/Re-Tag">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+    </a>
+
     <h1><a target="_blank" href="https://github.com/VikramN/Re-Tag">Re - Tag</a></h1>
 
     <p>React.js Tag Component</p>
-    <h3><a target="_blank" href="https://github.com/VikramN">By VikramN</a></h3>
+    <h3><a target="_blank" href="https://github.com/VikramN">By Vikram</a></h3>
 
     <div>
         <div style="width: 50%; display: inline-block; vertical-align: top">
             <h3>Demo 1</h3>
-            <p> In-line tags, just like in gmail. This has the following props set : breaks, handleBlur & handleEnter. <br />
+            <p style="line-height: 1.5"> In-line tags, just like in gmail. This has the following props set : breaks, handleBlur & handleEnter. <br />
                 You supply an array of chars that split a tag in the breaks prop ( , . ; and SPACE in this demo) <br />
                 You can type something and change focus to some other element to check out handleBlur<br />
                 You can hit enter to create tag cos we set handleEnter<br />
@@ -32,10 +34,11 @@
         </div>
         <div style="width: 47%; display: inline-block;vertical-align: top">
             <h3>Demo 2</h3>
-            <p> Tags appear in the next line. This doesn't handle Enter key or Blur events. <br />
+            <p style="line-height: 1.5"> Tags appear in the next line. This doesn't handle Enter key or Blur events. <br />
                 By default only SPACE and , are used to split tags <br />
                 You can also provide options on the model to handle add and delete events. This one for example, will add tags as lower-case, will not allow duplicates and won't let you delete first 5 tags<br />
             </p>
+
             <div style="border: 1px solid #ddd; width: 90%; min-height: 150px;">
                 <div id="tagInput2" style="display: block;">
 
@@ -45,81 +48,21 @@
         </div>
     </div>
     <p>
-        You can check out Demo.html & Demo.css to see how the components are created. You can provide your custom css class for tags as well for the input.
-        There are actually 2 components, one to just render the tags, and one to accept input. They can be run independently too.
-
-        There is a default model implementation TagCollection. You can ditch that and provide your implementation, just stick to the necessary interfaces. This model is very simple, it would be ideal to provide a immutable one.
+        You can check out Demo.html & Demo.css to see how the components are created. <br />
+        You can provide your custom css class for tags as well for the input. <br />
+        There are actually 2 components, one to just render the tags, and one to accept input. They can be run independently too. <br />
+        There is a default model implementation TagCollection. You can ditch that and provide your implementation, just stick to the necessary interfaces. This model is very simple, it would be ideal to provide an immutable one.
     </p>
 
     <h2>Sample Code</h2>
-      <pre>
-        // Default model
-        var tags1 = new TagCollection();
-
-        // Default model with options
-        var tags1 = new TagCollection({
-
-            // Return null to ignore add, else return the value that needs to be added
-            // You can do lookups, case conversion etc
-            onAdd : function(item, list){
-                var x = item.toLowerCase();
-                for(var i =0; i < list.length; i++) {
-                    if(list[i].tag.toLowerCase() === x) {
-                        return null;
-                    }
-                }
-
-                return x;
-            },
-
-            // Return true to delete, false to ignore delete
-            // Note - Key is passed in this scenario
-            onDelete : function(key, list){
-                for(var i =0; i < list.length; i++) {
-                    if(list[i].key === key && i < 5) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        });
-
-        // Render Tag Component
-        // props: css = css class for each tag, collection = set to the model
-        React.render(&lt;Tags css={'tag'} deleteCss={'deleteTag'} collection={tags1} /&gt;, document.getElementById('tagContainer1'));
-
-        // Render the tag input component, this is the one that accepts user input
-        // props:   css : input[type=text] css class,
-                    collection : model,
-                    breaks: array of chars to use for splitting [optional, defaults to , and SPACE]
-                    handleBlur : create tag on blur event [optional, won't handle]
-                    handleEnter : create tag on enter press [optional, won't handle]
-
-        var input1 =  React.render(
-            &lt;TagInput css={'tagInput1'}
-                collection={tags1}
-                breaks={[' ', ',', ';', '.']}
-                handleBlur={true}
-                handleEnter={true} /&gt;,
-            document.getElementById('tagInput1') );
-
-        // Example to set focus to input from outside
-        document.getElementById('make_focus').onclick = function(){
-            input1.setFocus();
-        };
-
-        // When all said and done, you can use getTags() to get array of tags held by the model
-        tags1.getTags()
-
-    </pre>
+    <script src="https://gist.github.com/VikramN/8a421db41863339b6488.js"></script>
 
     <script type="text/jsx">
         // Demo 1
-        var tags1 = new TagCollection();
+        var tags1 = new ReTag.TagCollection();
 
-        React.render(<Tags css={'tag'} deleteCss={'deleteTag'} collection={tags1} />, document.getElementById('tagContainer1') );
-        var input1 =  React.render(<TagInput css={'tagInput1'} collection={tags1} breaks={[' ', ',', ';', '.']} handleBlur={true} handleEnter={true} />, document.getElementById('tagInput1') );
+        React.render(<ReTag.Tags css={'tag'} deleteCss={'deleteTag'} collection={tags1} />, document.getElementById('tagContainer1') );
+        var input1 =  React.render(<ReTag.TagInput css={'tagInput1'} collection={tags1} breaks={[' ', ',', ';', '.']} handleBlur={true} handleEnter={true} />, document.getElementById('tagInput1') );
 
         // Set focus to input
         document.getElementById('make_focus').onclick = function(){
@@ -127,7 +70,7 @@
         };
 
         // Demo 2
-        var tags2 = new TagCollection({
+        var tags2 = new ReTag.TagCollection({
             onAdd : function(item, list){
                 var x = item.toLowerCase();
                 for(var i =0; i < list.length; i++) {
@@ -149,9 +92,10 @@
                 return true;
             }
         });
-        React.render(<Tags css={'tag'} deleteCss={'deleteTag'} collection={tags2}/>, document.getElementById('tagContainer2') );
-        React.render(<TagInput css={'tagInput2'} collection={tags2}  />, document.getElementById('tagInput2') );
+        React.render(<ReTag.Tags css={'tag'} deleteCss={'deleteTag'} collection={tags2}/>, document.getElementById('tagContainer2') );
+        React.render(<ReTag.TagInput css={'tagInput2'} collection={tags2}  />, document.getElementById('tagInput2') );
 
+        ReTag.addDefaultStyles();
 
         // Try in console for fun
         function add1(tag){
